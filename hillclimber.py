@@ -1,8 +1,8 @@
 import numpy as np
 import random
-fitness = 0
-distance = 0
+import simulatedAnnealing
 rows, cols = (100,100)
+epsilon = 0.05;
 def setUpMatrix():
     distances = np.random.randint(1, 10, size = (rows,cols))
     for i in range(cols):
@@ -25,18 +25,44 @@ def changeRoute(route):
     elif cols - 1 in valuesToChange:
         newRoute[0] = newRoute[cols - 1]
     return newRoute
-distances = setUpMatrix()
-route = random.sample(range(cols),cols)
-route[cols-1] = route[0]
-distance = getDistanceFromRoute(route, distances)
-fitness = distance * (-1)
 
-for i in range(10000000):
-    newRoute = changeRoute(route)
-    newDistance = getDistanceFromRoute(newRoute, distances)
-    if(newDistance < distance):
-        route = newRoute
-        distance = newDistance
-        fitness = distance * (-1)
-print(route)
-print('newDistance + %s' %distance)
+def classicHillClimber():
+    ## distances = setUpMatrix()
+    distances = np.loadtxt("/Users/sschwarz/Programming/MLE2019/outfile", dtype='i', delimiter=' ')
+    route = random.sample(range(cols),cols)
+    route[cols-1] = route[0]
+    distance = getDistanceFromRoute(route, distances)
+    fitness = distance * (-1)
+    for i in range(1000000):
+        newRoute = changeRoute(route)
+        newDistance = getDistanceFromRoute(newRoute, distances)
+        newFitness = newDistance * (-1)
+        if(newFitness > fitness):
+            route = newRoute
+            distance = newDistance
+            fitness = distance * (-1)
+    print(route)
+    print('newDistance + %s' %distance)
+def hillClimberWithSimulatedAnnealing(temp, epsilon):
+    temperature = temp;
+    # distances = setUpMatrix()
+    distances = np.loadtxt("/Users/sschwarz/Programming/MLE2019/outfile", dtype='i', delimiter=' ')
+    route = random.sample(range(cols),cols)
+    route[cols-1] = route[0]
+    distance = getDistanceFromRoute(route, distances)
+    fitness = distance * (-1)
+    while(temperature > epsilon):
+        newRoute = changeRoute(route)
+        newDistance = getDistanceFromRoute(newRoute, distances)
+        newFitness = newDistance * (-1)
+        if(simulatedAnnealing.simulatedAnnealing(newFitness, fitness, temp)):
+            route = newRoute
+            distance = newDistance
+            fitness = distance * (-1)
+        temperature -= epsilon
+        # Otherwise route remains the same
+    print(distances)
+    print('newDistance + %s' %distance)
+
+hillClimberWithSimulatedAnnealing(100, 0.001);
+#classicHillClimber();
