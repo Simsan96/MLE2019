@@ -1,8 +1,7 @@
 import numpy as np
 import random
 import simulatedAnnealing
-rows, cols = (100,100)
-epsilon = 0.05;
+rows, cols = (101,101)
 def setUpMatrix():
     distances = np.random.randint(1, 10, size = (rows,cols))
     for i in range(cols):
@@ -16,7 +15,7 @@ def getDistanceFromRoute(route, distances):
     return disSum
 def changeRoute(route):
     newRoute = route
-    valuesToChange = random.sample(range(10),2)
+    valuesToChange = random.sample(range(cols),2)
     tmp = route[valuesToChange[0]]
     newRoute[valuesToChange[0]] = route[valuesToChange[1]]
     newRoute[valuesToChange[1]] = tmp
@@ -27,8 +26,7 @@ def changeRoute(route):
     return newRoute
 
 def classicHillClimber():
-    ## distances = setUpMatrix()
-    distances = np.loadtxt("/Users/sschwarz/Programming/MLE2019/outfile", dtype='i', delimiter=' ')
+    distances = setUpMatrix()
     route = random.sample(range(cols),cols)
     route[cols-1] = route[0]
     distance = getDistanceFromRoute(route, distances)
@@ -40,13 +38,13 @@ def classicHillClimber():
         if(newFitness > fitness):
             route = newRoute
             distance = newDistance
+            print(newDistance)
             fitness = distance * (-1)
     print(route)
     print('newDistance + %s' %distance)
 def hillClimberWithSimulatedAnnealing(temp, epsilon):
     temperature = temp;
-    # distances = setUpMatrix()
-    distances = np.loadtxt("/Users/sschwarz/Programming/MLE2019/outfile", dtype='i', delimiter=' ')
+    distances = setUpMatrix()
     route = random.sample(range(cols),cols)
     route[cols-1] = route[0]
     distance = getDistanceFromRoute(route, distances)
@@ -58,11 +56,13 @@ def hillClimberWithSimulatedAnnealing(temp, epsilon):
         if(simulatedAnnealing.simulatedAnnealing(newFitness, fitness, temp)):
             route = newRoute
             distance = newDistance
+            print(newDistance)
             fitness = distance * (-1)
         temperature -= epsilon
         # Otherwise route remains the same
     print(distances)
-    print('newDistance + %s' %distance)
+    print('newDistance Annealing + %s' %distance)
 
-hillClimberWithSimulatedAnnealing(100, 0.001);
-#classicHillClimber();
+np.random.seed(541996)
+hillClimberWithSimulatedAnnealing(1000, 0.001);
+classicHillClimber();
