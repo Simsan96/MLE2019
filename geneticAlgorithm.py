@@ -4,13 +4,16 @@ import random
 
 np.random.seed(1996)
 
-bitLength = 8
-populationSize = 64
+bitLength = 100
+populationSize = 100
 crossOverRate = 0.5
 
-mutationrate = 0.001
+mutationRate = 0.1
 fitness = []
 population = []
+
+maxFitness = 0;
+
 
 
 def selectHypothesis():
@@ -41,12 +44,28 @@ def calcFitness(a, b):
     fitness = bitLength - dist
     return fitness
 
+def graycode(bitString):
+    graycode = []
+    graycode.append(bitString[0])
+    for i in range(len(bitString) - 1):
+        graycode.append(bitString[i]^bitString[i+1])
+
+    return graycode
+
+def reverseGraycode(graycode):
+    newBinary = []
+    newBinary.append(graycode[0])
+    for i in range(len(graycode) - 1):
+        newBinary.append(newBinary[i]^graycode[i+1])
+
+    return newBinary
+
 def createSuccessors(pairs) :
     successors = []
     crossOverLength = int(bitLength * crossOverRate)
 
-    for i in range(0,len(pairs)/2),2:
-        firstPartFirstSuccessor = pairs[i][0:crossOverLength]
+    for i in xrange(0,len(pairs),2):
+        firstPartFirstSuccessor = (pairs[i])[0:crossOverLength]
         secondPartFirstSuccessor = pairs[i+1][crossOverLength:bitLength]
         firstPartSecondSuccessor = pairs[i+1][0:crossOverLength]
         secondPartSecondSuccessor = pairs[i][crossOverLength:bitLength]
@@ -55,32 +74,57 @@ def createSuccessors(pairs) :
         successors.append(firstNewSuccessor)
         successors.append(secondNewSuccesor)
 
-    print(successors)
+    return successors
+
+def mutatePopulation(population):
+    popCopy = population
+    mutationSize = int(mutationRate * populationSize)
+    memberIndices = random.sample(range(1, populationSize), mutationSize)
+    while(fitness.index(maxFitness) in memberIndices):
+        memberIndices = random.sample(range(1, populationSize), mutationSize)
+
+    for i in range(mutationSize):
+        member = popCopy[memberIndices[i]]
+        indexOfBitToChange = np.random.randint(bitLength)
+        member[indexOfBitToChange] = 1 if member[indexOfBitToChange] == 0 else 0;
+        population[memberIndices[i]] = member
+
+
+    return popCopy
+
+
+
 
 
 optimum = np.random.randint(2, size = bitLength)
 population = np.random.randint(2 , size = (populationSize, bitLength))
-while (np.isin(population.all(), optimum)) :
-    optimum = np.random.randint(2, size = bitLength)
 
-fitness = list(map(lambda b:calcFitness(optimum, b), population))
+while(maxFitness < bitLength - 10):
+    fitness = list(map(lambda b:calcFitness(optimum, b), population))
+    maxFitness = max(fitness)
 
-selectionSize = int(round((1 - crossOverRate) * populationSize))
-print(selectionSize)
+    selectionSize = int(round((1 - crossOverRate) * populationSize))
 
-newPopulation = []
-for i in range(selectionSize):
-    currentIndex = selectHypothesis()
-    newPopulation.append(population[currentIndex])
-print(newPopulation[1])
+    newPopulation = []
+    for i in range(selectionSize):
+        currentIndex = selectHypothesis()
+        newPopulation.append(population[currentIndex])
 
-crossoverSize = round((crossOverRate*populationSize))
-print("crossover")
-print(crossoverSize)
-pairs = []
+    crossoverSize = round((crossOverRate*populationSize))
 
-for i in range(int(crossoverSize)):
-    currentIndex = selectHypothesis()
-    pairs.append(population[currentIndex])
+    pairs = []
 
-createSuccessors(pairs)
+    for i in range(int(crossoverSize)):
+        currentIndex = selectHypothesis()
+        pairs.append(population[currentIndex])
+
+
+    successors = createSuccessors(pairs)
+
+    newPopulation.extend(successors)
+
+    population = mutatePopulation(newPopulation)
+
+    maxFitness = max(fitness)
+
+    print(maxFitness)
