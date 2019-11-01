@@ -85,10 +85,10 @@ def mutatePopulation(population):
 
     for i in range(mutationSize):
         member = popCopy[memberIndices[i]]
+        memberGray = graycode(member)
         indexOfBitToChange = np.random.randint(bitLength)
-        member[indexOfBitToChange] = 1 if member[indexOfBitToChange] == 0 else 0;
-        population[memberIndices[i]] = member
-
+        memberGray[indexOfBitToChange] = 1 if memberGray[indexOfBitToChange] == 0 else 0;
+        popCopy[memberIndices[i]] = reverseGraycode(memberGray)
 
     return popCopy
 
@@ -99,7 +99,7 @@ def mutatePopulation(population):
 optimum = np.random.randint(2, size = bitLength)
 population = np.random.randint(2 , size = (populationSize, bitLength))
 
-while(maxFitness < bitLength - 10):
+while(maxFitness < bitLength - 5):
     fitness = list(map(lambda b:calcFitness(optimum, b), population))
     maxFitness = max(fitness)
 
