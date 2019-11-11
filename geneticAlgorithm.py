@@ -4,11 +4,11 @@ import random
 
 np.random.seed(1996)
 
-bitLength = 50
+bitLength = 100
 populationSize = 100
-crossOverRate = 0.5
+crossOverRate = 0.25
 
-mutationRate = 0.1
+mutationRate = 0.25
 fitness = []
 population = []
 newPopulation = []
@@ -72,7 +72,8 @@ def createSuccessors(pairs):
     successors = []
     crossOverLength = int(bitLength * crossOverRate)
 
-    for i in xrange(0, len(pairs), 2):
+
+    for i in range(0, len(pairs), 2):
         firstPartFirstSuccessor = (pairs[i])[0:crossOverLength]
         secondPartFirstSuccessor = pairs[i + 1][crossOverLength:bitLength]
         firstPartSecondSuccessor = pairs[i + 1][0:crossOverLength]
@@ -112,16 +113,19 @@ while (maxFitness < bitLength):
 
     selectionSize = int(round((1 - crossOverRate) * populationSize))
 
+    if(selectionSize % 2 != 0):
+        selectionSize = selectionSize -1
+
     newPopulation = []
     newPopulation.append(population[fitness.index(maxFitness)])
     for i in range(selectionSize - 1):
         currentIndex = selectHypothesis()
         newPopulation.append(population[currentIndex])
-    crossoverSize = round((crossOverRate * populationSize))
+    crossOverSize = populationSize - selectionSize
 
     pairs = []
 
-    for i in range(int(crossoverSize)):
+    for i in range(int(crossOverSize)):
         currentIndex = selectHypothesis()
         pairs.append(population[currentIndex])
 
