@@ -1,6 +1,6 @@
-import numpy as np
-from itertools import repeat
 import random
+
+import numpy as np
 
 np.random.seed(1996)
 
