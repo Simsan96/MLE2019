@@ -6,9 +6,9 @@ np.random.seed(1996)
 
 bitLength = 100
 populationSize = 100
-crossOverRate = 0.05
+crossOverRate = 0.33
 
-mutationRate = 0.15
+mutationRate = 0.05
 fitness = []
 population = []
 newPopulation = []
