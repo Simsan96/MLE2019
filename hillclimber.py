@@ -45,7 +45,7 @@ def classicHillClimber():
 
 
 def hillClimberWithSimulatedAnnealing(temp, epsilon):
-    temperature = temp;
+    temperature = temp
     distances = setUpMatrix()
     route = random.sample(range(cols),cols)
     route[cols-1] = route[0]
@@ -66,5 +66,5 @@ def hillClimberWithSimulatedAnnealing(temp, epsilon):
     print('newDistance Annealing + %s' %distance)
 
 np.random.seed(541996)
-hillClimberWithSimulatedAnnealing(1000, 0.001);
+hillClimberWithSimulatedAnnealing(1000, 0.001)
 # classicHillClimber();

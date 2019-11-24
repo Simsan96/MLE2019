@@ -1,6 +1,7 @@
 import sys
 import time
 import math
+import reinforcementLearning
 try:
     import numpy as np
 except:
@@ -32,7 +33,7 @@ class BasicGame(GameGL):
 
     xBall      = 5
     yBall      = 6
-    xSchlaeger = 5
+    xRacket    = 5
     xV         = 1
     yV         = 1
     score      = 0
@@ -42,6 +43,8 @@ class BasicGame(GameGL):
         self.windowName = name
         self.width      = width
         self.height     = height
+        coordinates = (self.xBall, self.yBall, self.xRacket, self.xV, self.yV)
+        self.reinforcementLearningInstance = reinforcementLearning.ReinforcementLearning(coordinates)
 
     def keyboard(self, key, x, y):
         # ESC = \x1w
@@ -60,16 +63,21 @@ class BasicGame(GameGL):
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity()
 
-        action = 2.0 * np.random.random() - 1.0
+
+        action = self.reinforcementLearningInstance.getAction()
+
+
+        #Move left
         if action < -0.3:
-            self.xSchlaeger -= 1
+            self.xRacket -= 1
+         #Move right
         if action >  0.3:
-            self.xSchlaeger += 1
+            self.xRacket += 1
         # don't allow puncher to leave the pitch
-        if self.xSchlaeger < 0:
-            self.xSchlaeger = 0
-        if self.xSchlaeger > 9:
-            self.xSchlaeger = 9
+        if self.xRacket < 0:
+            self.xRacket = 0
+        if self.xRacket > 9:
+            self.xRacket = 9
         
         self.xBall += self.xV
         self.yBall += self.yV
@@ -79,15 +87,23 @@ class BasicGame(GameGL):
         if (self.yBall > 10 or self.yBall < 1):
             self.yV = -self.yV
         # check whether ball on bottom line
+        coordinates = (self.xBall, self.yBall, self.xRacket, self.xV, self.yV)
+        newState = self.reinforcementLearningInstance.getState(coordinates)
         if self.yBall == 0:
             # check whther ball is at position of player
-            if (self.xSchlaeger == self.xBall 
-                or self.xSchlaeger == self.xBall -1
-                or self.xSchlaeger == self.xBall -2):
+            if (self.xRacket == self.xBall
+                or self.xRacket == self.xBall -1
+                or self.xRacket == self.xBall -2):
+                self.reinforcementLearningInstance.updateQ(newState,1)
+                self.score += 1
+                print("score", self.score)
                 print("positive reward")
             else:
+                self.reinforcementLearningInstance.updateQ(newState,-1)
+                self.score -= 1
+                print("score", self.score)
                 print("negative reward")
-        
+
         # repaint
         self.drawBall()
         self.drawComputer()
@@ -138,7 +154,7 @@ class BasicGame(GameGL):
         glEnd()
     
     def drawComputer(self, width = 3, height = 1, x = 0, y = 0, color = (1.0, 0.0, 0.0)):
-        x = self.xSchlaeger
+        x = self.xRacket
         xPos = x * self.pixelSize
         # set a bit away from bottom
         yPos = y * self.pixelSize# + (self.pixelSize * height / 2)

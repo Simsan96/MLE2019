@@ -1,31 +1,56 @@
 # -*- coding: utf-8 -*-
 import math
+import random
 """
 Created on Wed Nov 20 20:05:37 2019
 
 @author: Simon
 """
 
-alpha = 0.01
-
-action = 2.0 * np.random.random() - 1.0
-qTable = [[]]
-
-def getState(xCoordinates, sortedXCoordinates):
-    state = xCoordinates[0]
-    for(i in range(1,len(xCoordinates))):
-        s = s*max[i] + x[i]
-        
-    return s
 
 
-def getGamma(stepsToReward):
-    return math.exp(-stepsToReward)
+class ReinforcementLearning:
 
-def getReward(reward):
-    return reward
+    def __init__(self,xCoordinates):
+        # max xBall, max yBall, maxRacket, maxxV, maxxY
+        random.seed(1996)
+        self.maxForCoordinates = (10,10,9,1,1)
+        self.epsilon = 0.2
+        self.qTable = [[]]
+        self.stateT = self.getState(xCoordinates)
+        self.alpha = 0.01
+        for i in range(900):
+           newList = []
+           newList.append(random.uniform(0, 0.3))
+           newList.append(random.uniform(0, 0.3))
+           newList.append(random.uniform(0, 0.3))
+           self.qTable.append(newList)
 
-for(i in range(2)):
-    qTable[0].append(0.01)
-    qTable[1].append(0.01)
-    
+    def getState(self, xCoordinates):
+        state = xCoordinates[0]
+        for i in range(len(xCoordinates)- 1):
+            state = state * self.maxForCoordinates[i + 1] + xCoordinates[i + 1]
+        #print("state ",state)
+        return state
+
+
+    def getGamma(self, stepsToReward):
+        return math.exp(-stepsToReward)
+
+    def getReward(self,reward):
+        return reward
+
+    def getAction(self):
+        if self.epsilon > random.uniform(0.0, 0.5):
+            return  2.0 * random.random() - 1.0
+        if self.qTable[self.stateT].index(max(self.qTable[self.stateT])) == 0:
+            return 0
+        elif self.qTable[self.stateT].index(max(self.qTable[self.stateT])) == 1:
+            return 0.5
+        return -0.5
+
+
+    def updateQ(self, nextState, reward):
+         for i in range(len(self.qTable[self.stateT])):
+            self.qTable[self.stateT][i] = self.qTable[self.stateT][i] + self.alpha * (reward + (self.getGamma(1) * max(self.qTable[nextState])) - self.qTable[self.stateT][i])
+         self.stateT = nextState

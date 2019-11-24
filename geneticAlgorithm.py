@@ -1,14 +1,14 @@
 import random
-
+import math
 import numpy as np
 
 np.random.seed(1996)
 
 bitLength = 100
 populationSize = 100
-crossOverRate = 0.25
+crossOverRate = 0.5
 
-mutationRate = 0.25
+mutationRate = 0.05
 fitness = []
 population = []
 newPopulation = []
@@ -49,25 +49,6 @@ def calcFitness(a, b):
 
     return fitness
 
-
-def graycode(bitString):
-    graycode = []
-    graycode.append(bitString[0])
-    for i in range(len(bitString) - 1):
-        graycode.append(bitString[i] ^ bitString[i + 1])
-
-    return graycode
-
-
-def reverseGraycode(graycode):
-    newBinary = []
-    newBinary.append(graycode[0])
-    for i in range(len(graycode) - 1):
-        newBinary.append(newBinary[i] ^ graycode[i + 1])
-
-    return newBinary
-
-
 def createSuccessors(pairs):
     successors = []
     crossOverLength = int(bitLength * crossOverRate)
@@ -85,43 +66,57 @@ def createSuccessors(pairs):
 
     return successors
 
+def createFitnessList(optimum, population):
+    fitnessList = []
+    for i in range(0, len(population)):
+        fitnessList.append(calcFitness(optimum, population[i]))
+
+
+    return fitnessList
 
 def mutatePopulation(population):
     popCopy = population
-    mutationSize = int(mutationRate * populationSize)
-    memberIndices = random.sample(range(1, populationSize), mutationSize)
-    while (fitness.index(maxFitness) in memberIndices):
-        memberIndices = random.sample(range(1, populationSize), mutationSize)
+    fitness = createFitnessList(optimum, popCopy)
+    maxFitness = max(fitness)
+    mutationSize = math.ceil(mutationRate * populationSize)
+    memberIndices = random.sample(range(0, populationSize), mutationSize)
 
     for i in range(mutationSize):
-        member = popCopy[memberIndices[i]]
-        memberGray = graycode(member)
-        indexOfBitToChange = np.random.randint(bitLength)
-        memberGray[indexOfBitToChange] = 1 if memberGray[indexOfBitToChange] == 0 else 0;
-        popCopy[memberIndices[i]] = reverseGraycode(memberGray)
+        if(memberIndices[i] != fitness.index(maxFitness)):
+            member = popCopy[memberIndices[i]]
+            indexOfBitToChange = np.random.randint(bitLength)
+            member[indexOfBitToChange] = 1 if member[indexOfBitToChange] == 0 else 0;
+            popCopy[memberIndices[i]] = member
+            fitness = createFitnessList(optimum, popCopy)
+            maxFitness = max(fitness)
+            print(maxFitness)
 
     return popCopy
 
 
 optimum = np.random.randint(2, size=bitLength)
 population = np.random.randint(2, size=(populationSize, bitLength))
+selectionSize = int(round((1 - crossOverRate) * populationSize))
+if(selectionSize % 2 != 0):
+    selectionSize = selectionSize -1
 
+crossOverSize = populationSize - selectionSize
+
+
+iterations = 0
 while (maxFitness < bitLength):
-    fitness = list(map(lambda b: calcFitness(optimum, b), population))
+    iterations = iterations +1
+    fitness = createFitnessList(optimum, population)
 
     maxFitness = max(fitness)
 
-    selectionSize = int(round((1 - crossOverRate) * populationSize))
-
-    if(selectionSize % 2 != 0):
-        selectionSize = selectionSize -1
-
     newPopulation = []
     newPopulation.append(population[fitness.index(maxFitness)])
+
     for i in range(selectionSize - 1):
         currentIndex = selectHypothesis()
         newPopulation.append(population[currentIndex])
-    crossOverSize = populationSize - selectionSize
+
 
     pairs = []
 
@@ -135,13 +130,16 @@ while (maxFitness < bitLength):
 
     population = mutatePopulation(newPopulation)
 
+    fitness = createFitnessList(optimum, population)
+
     maxFitness = max(fitness)
 
-    print(maxFitness)
 
-fitness = list(map(lambda b: calcFitness(optimum, b), population))
+fitness = createFitnessList(optimum, population)
 maxFitness = max(fitness)
 
 print(population[fitness.index(maxFitness)])
 
 print(optimum)
+
+print(iterations)
