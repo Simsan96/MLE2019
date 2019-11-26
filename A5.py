@@ -65,6 +65,8 @@ class BasicGame(GameGL):
 
 
         action = self.reinforcementLearningInstance.getAction()
+        
+        #print(self.reinforcementLearningInstance.getState((10,10,9,1,1)))
 
 
         #Move left
@@ -88,6 +90,7 @@ class BasicGame(GameGL):
             self.yV = -self.yV
         # check whether ball on bottom line
         coordinates = (self.xBall, self.yBall, self.xRacket, self.xV, self.yV)
+        print(coordinates)
         newState = self.reinforcementLearningInstance.getState(coordinates)
         if self.yBall == 0:
             # check whther ball is at position of player
