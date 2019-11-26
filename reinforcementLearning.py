@@ -28,9 +28,11 @@ class ReinforcementLearning:
            self.qTable.append(newList)
 
     def getState(self, xCoordinates):
+        print(xCoordinates)
         state = xCoordinates[0]
         for i in range(1, len(xCoordinates) - 1):
-            state = state * self.maxForCoordinates[i] + xCoordinates[i]
+            state = state * self.maxForCoordinates[i] * xCoordinates[i]
+            
         return state
 
 
@@ -41,7 +43,7 @@ class ReinforcementLearning:
         return reward
 
     def getAction(self):
-        if self.epsilon > random.uniform(0.0, 0.5):
+        if self.epsilon > random.uniform(0.0, 1.0):
             return  2.0 * random.random() - 1.0
         if self.qTable[self.stateT].index(max(self.qTable[self.stateT])) == 0:
             return 0
