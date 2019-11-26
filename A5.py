@@ -103,7 +103,7 @@ class BasicGame(GameGL):
                 self.score -= 1
                 print("score", self.score)
                 print("negative reward")
-
+        self.reinforcementLearningInstance.updateQ(newState,0)
         # repaint
         self.drawBall()
         self.drawComputer()
