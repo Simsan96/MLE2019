@@ -14,12 +14,13 @@ class ReinforcementLearning:
     def __init__(self,xCoordinates):
         # max xBall, max yBall, maxRacket, maxxV, maxxY
         random.seed(1996)
-        self.maxForCoordinates = (10,10,9,1,1)
+        self.maxForCoordinates = (11,11,10,2,2)
+        self.numberOfStates = 11 * 11 * 10 * 2 * 2
         self.epsilon = 0.2
         self.qTable = [[]]
         self.stateT = self.getState(xCoordinates)
         self.alpha = 0.01
-        for i in range(900):
+        for i in range(self.numberOfStates):
            newList = []
            newList.append(random.uniform(0, 0.3))
            newList.append(random.uniform(0, 0.3))
@@ -28,9 +29,8 @@ class ReinforcementLearning:
 
     def getState(self, xCoordinates):
         state = xCoordinates[0]
-        for i in range(len(xCoordinates)- 1):
-            state = state * self.maxForCoordinates[i + 1] + xCoordinates[i + 1]
-        #print("state ",state)
+        for i in range(1, len(xCoordinates) - 1):
+            state = state * self.maxForCoordinates[i] + xCoordinates[i]
         return state
 
 
@@ -51,6 +51,7 @@ class ReinforcementLearning:
 
 
     def updateQ(self, nextState, reward):
+         print("nextState", nextState)
          for i in range(len(self.qTable[self.stateT])):
             self.qTable[self.stateT][i] = self.qTable[self.stateT][i] + self.alpha * (reward + (self.getGamma(1) * max(self.qTable[nextState])) - self.qTable[self.stateT][i])
          self.stateT = nextState
