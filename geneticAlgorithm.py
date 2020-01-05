@@ -6,7 +6,7 @@ np.random.seed(1996)
 
 bitLength = 100
 populationSize = 100
-crossOverRate = 0.33
+crossOverRate = 0.25
 
 mutationRate = 0.05
 fitness = []
@@ -60,9 +60,9 @@ def createSuccessors(pairs):
         firstPartSecondSuccessor = pairs[i + 1][0:crossOverLength]
         secondPartSecondSuccessor = pairs[i][crossOverLength:bitLength]
         firstNewSuccessor = np.append(firstPartFirstSuccessor, secondPartFirstSuccessor)
-        secondNewSuccesor = np.append(firstPartSecondSuccessor, secondPartSecondSuccessor)
+        secondNewSuccessor = np.append(firstPartSecondSuccessor, secondPartSecondSuccessor)
         successors.append(firstNewSuccessor)
-        successors.append(secondNewSuccesor)
+        successors.append(secondNewSuccessor)
 
     return successors
 
@@ -76,7 +76,7 @@ def createFitnessList(optimum, population):
 
 
 def mutatePopulation(population):
-    popCopy = population
+    popCopy = population.copy()
     mutationSize = math.ceil(mutationRate * populationSize)
     usedIndices = []
 

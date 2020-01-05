@@ -31,7 +31,6 @@ class ReinforcementLearning:
         state = xCoordinates[0]
         for i in range(1, len(xCoordinates)):
             state = state*self.maxForCoordinates[i] + xCoordinates[i]
-            print(state)
         return state
 
 
@@ -52,7 +51,9 @@ class ReinforcementLearning:
 
 
     def updateQ(self, nextState, reward):
-         print("nextState", nextState)
+         #print("nextState", nextState)
          for i in range(len(self.qTable[self.stateT])):
             self.qTable[self.stateT][i] = self.qTable[self.stateT][i] + self.alpha * (reward + (self.getGamma(1) * max(self.qTable[nextState])) - self.qTable[self.stateT][i])
          self.stateT = nextState
+         print(self.qTable[self.stateT])
+         print(max(self.qTable[self.stateT]))
