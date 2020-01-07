@@ -37,7 +37,7 @@ class BasicGame(GameGL):
     xV         = 1
     yV         = 1
     score      = 0
-    
+
     def __init__(self, name, width = 360, height = 360):
         super
         self.windowName = name
@@ -52,6 +52,8 @@ class BasicGame(GameGL):
             sys.exit(0)
 
     def display(self):
+        counter = 0
+
         # clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         # reset position
@@ -65,7 +67,7 @@ class BasicGame(GameGL):
 
 
         action = self.reinforcementLearningInstance.getAction()
-        
+
         #print(self.reinforcementLearningInstance.getState((10,10,9,1,1)))
 
 
@@ -80,17 +82,16 @@ class BasicGame(GameGL):
             self.xRacket = 0
         if self.xRacket > 9:
             self.xRacket = 9
-        
+
         self.xBall += self.xV
         self.yBall += self.yV
         # change direction of ball if it's at wall
         if (self.xBall > 10 or self.xBall < 1):
             self.xV = -self.xV
-        if (self.yBall > 10 or self.yBall < 1):
+        if (self.yBall > 11 or self.yBall < 1):
             self.yV = -self.yV
         # check whether ball on bottom line
         coordinates = (self.xBall, self.yBall, self.xRacket, self.xV, self.yV)
-        print(coordinates)
         newState = self.reinforcementLearningInstance.getState(coordinates)
         if self.yBall == 0:
             # check whther ball is at position of player
@@ -107,15 +108,17 @@ class BasicGame(GameGL):
                 print("score", self.score)
                 print("negative reward")
         self.reinforcementLearningInstance.updateQ(newState,0)
+        counter += 1
         # repaint
-        self.drawBall()
-        self.drawComputer()
-        
+        if(counter > 10000):
+            self.drawBall()
+            self.drawComputer()
+            time.sleep(0.1)
         # timeout of 100 milliseconds
-        time.sleep(0.1)
-        
+
+
         glutSwapBuffers()
-    
+
     def start(self):
         glutInit()
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH)
@@ -127,16 +130,16 @@ class BasicGame(GameGL):
         glutReshapeFunc(self.onResize)
         glutIdleFunc(self.display)
         glutKeyboardFunc(self.keyboard)
-        glutMainLoop() 
-    
+        glutMainLoop()
+
     def updateSize(self):
         self.width  = glutGet(GLUT_WINDOW_WIDTH)
         self.height = glutGet(GLUT_WINDOW_HEIGHT)
-    
+
     def onResize(self, width, height):
         self.width  = width
         self.height = height
-    
+
     def drawBall(self, width = 1, height = 1, x = 5, y = 6, color = (0.0, 1.0, 0.0)):
         x = self.xBall
         y = self.yBall
@@ -155,7 +158,7 @@ class BasicGame(GameGL):
         # top left point
         glVertex2f(xPos, yPos + (self.pixelSize * height))
         glEnd()
-    
+
     def drawComputer(self, width = 3, height = 1, x = 0, y = 0, color = (1.0, 0.0, 0.0)):
         x = self.xRacket
         xPos = x * self.pixelSize

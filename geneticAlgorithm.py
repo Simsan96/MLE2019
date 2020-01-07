@@ -6,7 +6,7 @@ np.random.seed(1996)
 
 bitLength = 100
 populationSize = 100
-crossOverRate = 0.25
+crossOverRate = 0.5
 
 mutationRate = 0.05
 fitness = []
@@ -52,9 +52,10 @@ def calcFitness(a, b):
 
 def createSuccessors(pairs):
     successors = []
-    crossOverLength = int(bitLength * crossOverRate)
+
 
     for i in range(0, len(pairs), 2):
+        crossOverLength = random.randint(0,bitLength)
         firstPartFirstSuccessor = (pairs[i])[0:crossOverLength]
         secondPartFirstSuccessor = pairs[i + 1][crossOverLength:bitLength]
         firstPartSecondSuccessor = pairs[i + 1][0:crossOverLength]
@@ -94,7 +95,7 @@ def mutatePopulation(population):
     return popCopy
 
 
-optimum = np.random.randint(2, size=bitLength)
+optimum = np.random.randint(2, size = bitLength)
 population = np.random.randint(2, size=(populationSize, bitLength))
 selectionSize = int(round((1 - crossOverRate) * populationSize))
 if (selectionSize % 2 != 0):

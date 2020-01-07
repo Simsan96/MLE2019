@@ -1,9 +1,13 @@
 import math
 import random
+import pygame
+import np
+import time
+
 
 # we have 194 entries( sqrt(194) = 13.9)
 # Since 14 is even we choose 13 as k
-k = 193
+k = 13
 
 
 
@@ -21,14 +25,14 @@ for line in lines:
     spiralValue = int(vector.pop(2))
     spiralClassification.append(spiralValue)
     spiralPoints.append(vector)
-    
+
 
 
 def getEuclidDist(v1, v2):
     dist = 0
     for i in range(len(v1)):
         dist += (pow((v2[i] - v1[i]),2))
-    
+
     return math.sqrt(dist)
 
 def determineDistanceToAllPoints(vec):
@@ -49,34 +53,52 @@ def getMininumDistanceIndicesFromList(distances):
         distanceCopy[minIndex] = max(distanceCopy)
     return minIndices
 
-# Choose random point on spiral
+def evalVector(vec):
+    minimumIndices = getMininumDistanceIndicesFromList(determineDistanceToAllPoints(vec))
+    counter = 0
+    for i in range(len(minimumIndices)):
+        counter += spiralClassification[minimumIndices[i]]
+    if counter > 0:
+        return 1
+    return -1
 
-indexOfPointToBeClassified = 32
+pygame.init()
+screen = pygame.display.set_mode((400, 400))
+screen.fill((255,255,255))
 
-distances = determineDistanceToAllPoints(spiralPoints[indexOfPointToBeClassified])
+#x_array = np.arange(-1,1,0.01)
+#y_array = np.arange(-1,1,0.01)
 
-minIndices = getMininumDistanceIndicesFromList(distances)
 
-# Check classification according to indices of points with minimal distance
 
-blueSpiralCounter = 0
-redSpiralCounter = 0
-
-for i in range(len(minIndices)):
-    if(spiralClassification[minIndices[i]] == 1):
-        blueSpiralCounter +=1;
+for i in range(len(spiralPoints)):
+    classification = spiralClassification[i]
+    # 1 represents red
+    if( classification == 1):
+        pygame.draw.rect(screen, (255, 0, 0), pygame.Rect((spiralPoints[i][0] +1)*200, (spiralPoints[i][1]+1)*200, 2, 2))
+    #-1 represents blue
     else:
-        redSpiralCounter += 1;
-print(blueSpiralCounter)
-print(redSpiralCounter)
-if(blueSpiralCounter > redSpiralCounter):
-    print("point is on blue spiral")
-    print("Verification", spiralClassification[indexOfPointToBeClassified] == 1)
-else:
-    print("point is on red spiral")
-    print(indexOfPointToBeClassified)
-    print(spiralClassification[indexOfPointToBeClassified])
-    print("Verification", spiralClassification[indexOfPointToBeClassified] == -1)
+        pygame.draw.rect(screen, (0, 0, 255), pygame.Rect((spiralPoints[i][0]+1)*200, (spiralPoints[i][1]+1)*200,2, 2))
+    pygame.event.get()
+    pygame.display.flip()
 
-    
-    
+
+xCoordinate = -1
+while xCoordinate <= 1:
+    yCoordinate = -1
+    while yCoordinate <= 1:
+        vec = (xCoordinate, yCoordinate)
+        value = evalVector(vec)
+        if(value == 1):
+            pygame.draw.rect(screen, (255, 0, 0), pygame.Rect((xCoordinate +1)*200, (yCoordinate +1)*200, 2 ,2),1)
+        else:
+            pygame.draw.rect(screen, (0, 0, 255), pygame.Rect((xCoordinate +1)*200, (yCoordinate +1)*200, 2 ,2),1)
+        pygame.event.get()
+        pygame.display.flip()
+        yCoordinate += 0.02
+    xCoordinate += 0.02
+
+
+
+time.sleep(10)
+#pygame.quit()
