@@ -37,6 +37,7 @@ class BasicGame(GameGL):
     xV         = 1
     yV         = 1
     score      = 0
+    lastReward = 0
 
     def __init__(self, name, width = 360, height = 360):
         super
@@ -66,16 +67,19 @@ class BasicGame(GameGL):
         glLoadIdentity()
 
 
-        action = self.reinforcementLearningInstance.getAction()
+
+        coordinates = (self.xBall, self.yBall, self.xRacket, self.xV, self.yV)
+        newState = self.reinforcementLearningInstance.getState(coordinates)
+        action = self.reinforcementLearningInstance.getAction(newState, self.lastReward)
 
         #print(self.reinforcementLearningInstance.getState((10,10,9,1,1)))
 
 
         #Move left
-        if action < -0.3:
+        if action == 0:
             self.xRacket -= 1
          #Move right
-        if action >  0.3:
+        if action == 2:
             self.xRacket += 1
         # don't allow puncher to leave the pitch
         if self.xRacket < 0:
@@ -91,23 +95,22 @@ class BasicGame(GameGL):
         if (self.yBall > 11 or self.yBall < 1):
             self.yV = -self.yV
         # check whether ball on bottom line
-        coordinates = (self.xBall, self.yBall, self.xRacket, self.xV, self.yV)
-        newState = self.reinforcementLearningInstance.getState(coordinates)
+
         if self.yBall == 0:
             # check whther ball is at position of player
             if (self.xRacket == self.xBall
                 or self.xRacket == self.xBall -1
                 or self.xRacket == self.xBall -2):
-                self.reinforcementLearningInstance.updateQ(newState,1)
                 self.score += 1
+                self.lastReward = 1
                 print("score", self.score)
                 print("positive reward")
             else:
-                self.reinforcementLearningInstance.updateQ(newState,-1)
                 self.score -= 1
+                self.lastReward = -1
                 print("score", self.score)
                 print("negative reward")
-        self.reinforcementLearningInstance.updateQ(newState,0)
+        self.lastReward = 0
         counter += 1
         # repaint
         if(counter > 10000):
